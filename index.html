@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta name="description" content="バスケットボールの開催予定を登録・検索・管理できるスケジュールアプリ" />
+
+    <title>HOOP FINDER | バスケ予定管理</title>
+
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="#" class="logo" aria-label="HOOP FINDER トップ">
+                <span class="logo-icon">🏀</span>
+
+                <span class="logo-text">
+                    <strong>HOOP FINDER</strong>
+                    <small>BASKETBALL SCHEDULE</small>
+                </span>
+            </a>
+
+            <div class="header-actions">
+                <div id="userMenu" hidden>
+                    <img id="userPhoto" src="" alt="ユーザーアイコン" />
+                    <span id="userName"></span>
+
+                    <button id="logoutButton" type="button">
+                        ログアウト
+                    </button>
+                </div>
+                
+                <button id="themeButton" class="icon-button" type="button" aria-label="ダークモードを切り替える">
+                    <span id="themeIcon">🌙</span>
+                </button>
+
+                <button id="openFormButton" class="primary-button" type="button">
+                    <span>＋</span>
+                    予定を追加
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ログイン状態を確認中 -->
+    <section id="authLoading">
+        <p>ログイン状態を確認しています...</p>
+    </section>
+
+    <!-- 未ログイン時に表示 -->
+    <section id="loginView" hidden>
+        <h2>HOOP FINDERへログイン</h2>
+        <p>予定を保存・同期するにはGoogleログインが必要です。</p>
+
+        <button id="loginButton" type="button">
+            Googleでログイン
+        </button>
+
+        <p id="loginError" role="alert"></p>
+    </section>
+
+    <main id="appContent" class="main-content" hidden>
+        <section class="hero">
+            <div class="hero-content">
+                <p class="eyebrow">FIND YOUR NEXT GAME</p>
+
+                <h1>
+                    次のバスケを、<br />
+                    もっと簡単に。
+                </h1>
+
+                <p class="hero-description">
+                    バスケの開催予定をひとつにまとめて、
+                    今日・明日・これから参加できるイベントをすぐに見つけよう。
+                </p>
+
+                <button id="heroAddButton" class="hero-button" type="button">
+                    新しい予定を登録する
+                    <span>→</span>
+                </button>
+            </div>
+
+            <div class="next-game-card">
+                <p class="card-label">NEXT GAME</p>
+
+                <div id="nextGameContent">
+                    <p class="next-game-empty">次の予定を確認しています...</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="stats-grid" aria-label="予定の集計">
+            <article class="stat-card">
+                <div class="stat-icon stat-icon-orange">🏀</div>
+
+                <div>
+                    <p>登録中の予定</p>
+                    <strong id="totalCount">0</strong>
+                    <span>件</span>
+                </div>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-icon stat-icon-blue">📅</div>
+
+                <div>
+                    <p>今月の予定</p>
+                    <strong id="monthlyCount">0</strong>
+                    <span>件</span>
+                </div>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-icon stat-icon-green">✓</div>
+
+                <div>
+                    <p>参加予定</p>
+                    <strong id="joinedCount">0</strong>
+                    <span>件</span>
+                </div>
+            </article>
+        </section>
+
+        <section class="schedule-panel">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">SCHEDULE</p>
+                    <h2>バスケ予定</h2>
+                </div>
+
+                <button id="clearSampleButton" class="text-button" type="button">
+                    サンプルを削除
+                </button>
+            </div>
+
+            <div class="date-tabs" role="group" aria-label="表示期間を選択">
+                <button class="date-tab active" type="button" data-filter="upcoming">
+                    今後の予定
+                </button>
+
+                <button class="date-tab" type="button" data-filter="today">
+                    今日
+                </button>
+
+                <button class="date-tab" type="button" data-filter="tomorrow">
+                    明日
+                </button>
+
+                <button class="date-tab" type="button" data-filter="joined">
+                    参加予定
+                </button>
+
+                <button class="date-tab" type="button" data-filter="past">
+                    過去
+                </button>
+            </div>
+
+            <div class="filter-area">
+                <div class="search-box">
+                    <span aria-hidden="true">⌕</span>
+
+                    <input id="searchInput" type="search" placeholder="イベント名・場所から検索" aria-label="予定を検索" />
+                </div>
+
+                <div class="select-box">
+                    <label for="areaFilter">エリア</label>
+
+                    <select id="areaFilter">
+                        <option value="all">すべて</option>
+                        <option value="東京都">東京都</option>
+                        <option value="神奈川県">神奈川県</option>
+                        <option value="千葉県">千葉県</option>
+                        <option value="埼玉県">埼玉県</option>
+                        <option value="その他">その他</option>
+                    </select>
+                </div>
+
+                <div class="select-box">
+                    <label for="statusFilter">募集状況</label>
+
+                    <select id="statusFilter">
+                        <option value="all">すべて</option>
+                        <option value="募集中">募集中</option>
+                        <option value="残りわずか">残りわずか</option>
+                        <option value="締切">締切</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="result-information">
+                <p id="resultCount">0件の予定</p>
+
+                <label class="sort-label" for="sortSelect">
+                    並び順
+
+                    <select id="sortSelect">
+                        <option value="dateAsc">開催日が近い順</option>
+                        <option value="dateDesc">開催日が遠い順</option>
+                        <option value="priceAsc">参加費が安い順</option>
+                    </select>
+                </label>
+            </div>
+
+            <div id="scheduleList" class="schedule-list"></div>
+
+            <!-- 予定がない場合 -->
+            <div id="emptyState" class="empty-state" hidden>
+                <div class="empty-icon">🏀</div>
+                <h3>予定が見つかりませんでした</h3>
+                <p>検索条件を変更するか、新しい予定を追加してください。</p>
+
+                <button id="emptyAddButton" class="secondary-button" type="button">
+                    予定を追加する
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <dialog id="scheduleDialog" class="schedule-dialog">
+        <form id="scheduleForm" class="schedule-form">
+            <div class="dialog-header">
+                <div>
+                    <p class="eyebrow">SCHEDULE EDITOR</p>
+                    <h2 id="formTitle">新しい予定を追加</h2>
+                </div>
+
+                <button id="closeFormButton" class="close-button" type="button" aria-label="フォームを閉じる">
+                    ×
+                </button>
+            </div>
+
+            <input id="scheduleId" type="hidden" />
+
+            <div class="form-grid">
+                <div class="form-group form-group-full">
+                    <label for="eventName">イベント名</label>
+
+                    <input id="eventName" name="eventName" type="text" maxlength="50" placeholder="例：週末エンジョイバスケ"
+                        required />
+                </div>
+
+                <div class="form-group">
+                    <label for="eventDate">開催日</label>
+
+                    <input id="eventDate" name="eventDate" type="date" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="eventArea">エリア</label>
+
+                    <select id="eventArea" name="eventArea" required>
+                        <option value="">選択してください</option>
+                        <option value="東京都">東京都</option>
+                        <option value="神奈川県">神奈川県</option>
+                        <option value="千葉県">千葉県</option>
+                        <option value="埼玉県">埼玉県</option>
+                        <option value="その他">その他</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="startTime">開始時間</label>
+
+                    <input id="startTime" name="startTime" type="time" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="endTime">終了時間</label>
+
+                    <input id="endTime" name="endTime" type="time" required />
+                </div>
+
+                <div class="form-group form-group-full">
+                    <label for="eventPlace">開催場所</label>
+
+                    <input id="eventPlace" name="eventPlace" type="text" maxlength="60" placeholder="例：サンプルアリーナA"
+                        required />
+                </div>
+
+                <div class="form-group">
+                    <label for="eventPrice">参加費</label>
+
+                    <div class="price-input">
+                        <input id="eventPrice" name="eventPrice" type="number" min="0" max="100000" step="100"
+                            placeholder="500" required />
+
+                        <span>円</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="eventStatus">募集状況</label>
+
+                    <select id="eventStatus" name="eventStatus" required>
+                        <option value="募集中">募集中</option>
+                        <option value="残りわずか">残りわずか</option>
+                        <option value="締切">締切</option>
+                    </select>
+                </div>
+
+                <div class="form-group form-group-full">
+                    <label for="eventMemo">
+                        メモ
+                        <span>任意</span>
+                    </label>
+
+                    <textarea id="eventMemo" name="eventMemo" maxlength="200" rows="4"
+                        placeholder="持ち物、レベル、集合時間など"></textarea>
+                </div>
+            </div>
+
+            <p id="formError" class="form-error" role="alert"></p>
+
+            <div class="form-actions">
+                <button id="cancelFormButton" class="cancel-button" type="button">
+                    キャンセル
+                </button>
+
+                <button class="primary-button save-button" type="submit">
+                    予定を保存
+                </button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- 削除確認モーダル -->
+    <dialog id="deleteDialog" class="delete-dialog">
+        <div class="delete-content">
+            <div class="delete-icon">!</div>
+
+            <h2>この予定を削除しますか？</h2>
+            <p>削除した予定は元に戻せません。</p>
+
+            <div class="delete-actions">
+                <button id="cancelDeleteButton" class="cancel-button" type="button">
+                    キャンセル
+                </button>
+
+                <button id="confirmDeleteButton" class="danger-button" type="button">
+                    削除する
+                </button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- 処理完了メッセージ -->
+    <div id="toast" class="toast" role="status" aria-live="polite">
+        <span id="toastIcon">✓</span>
+        <p id="toastMessage">予定を保存しました</p>
+    </div>
+
+    <footer class="site-footer">
+        <div>
+            <strong>HOOP FINDER</strong>
+            <p>Find your next game.</p>
+        </div>
+
+        <p>Built with HTML, CSS & JavaScript</p>
+    </footer>
+
+    <script type="module" src="app.js"></script>
+</body>
+
+</html>
