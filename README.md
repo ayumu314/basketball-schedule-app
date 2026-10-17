@@ -1,4 +1,4 @@
-HTML／CSS／JavaScriptとFirebaseを使用し、バスケットボールの予定を一元管理できるWebアプリを制作しました。
+HTML／CSS／JavaScriptとFirebaseを使用し、バスケットボールの予定を管理できるWebアプリを制作しました。
 
 【主な機能】
 ・Googleアカウントでのログイン／ログアウト
