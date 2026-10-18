@@ -1,5 +1,6 @@
 HTML／CSS／JavaScriptとFirebaseを使用し、バスケットボールの予定を管理できるWebアプリを制作しました。
 https://ayumu314.github.io/basketball-schedule-app/
+
 【主な機能】
 ・Googleアカウントでのログイン／ログアウト
 ・予定の追加、編集、削除
